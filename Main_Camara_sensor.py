@@ -30,7 +30,7 @@ GPIO.output(TRIG, False)
 GPIO.setup(ECHO, GPIO.IN)
 
 # Button Definition
-button = Button(37)    # Button pin definition
+button = Button(26)    # Button pin definition
 # ----------------------------------------------------------------------------------------------------------------------
 # FUNCTIONS
 # ----------------------------------------------------------------------------------------------------------------------
