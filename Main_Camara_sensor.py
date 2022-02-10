@@ -8,6 +8,7 @@
 import cv2
 import time
 import numpy as np
+import sys
 
 import picamera
 import RPi.GPIO as GPIO
@@ -72,53 +73,56 @@ if __name__ == '__main__':
     # Initialization
     count = 0
             
-    #Definition of t_end = 10 seconds. The maximum period of time where the camera program is active
+    #Definition of t_end = 60 seconds. The maximum period of time where the camera program is active
     t_end = time.time() + 60
             
     while True:
         try:
             # OpenCV configuration in order to have full screen viewer
-            cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
-            cv2.setWindowProperty("window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            #cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
+            #cv2.setWindowProperty("window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+                        
+            # Camera turn on
+            cap = cv2.VideoCapture(0)
 
-            # Measuring Distance
-            dist = distance()
-            print("Measured Distance = %.1f cm" % dist)
+            # Do while the video camera is on
+            while cap.isOpened():
+                # Read Video frame by frame
+                ret, frame = cap.read()
 
-            # Taking the picture
-            if dist <= 10:
-                # Count
-                count += 1
+                if ret is False:
+                    break
+                    
+                # Showing the image
+                cv2.imshow("Video", frame)
 
-                # Camera turn on
-                cap = cv2.VideoCapture(0)
+                # Measuring Distance
+                dist = distance()
+                print("Measured Distance = %.1f cm" % dist)
 
-                # Do while the video camera is on
-                while cap.isOpened():
-                    # Read Video frame by frame
-                    ret, frame = cap.read()
-
-                    if ret is False:
-                        break
+                # Taking the picture
+                if dist <= 10:
+                    # Count
+                    count += 1
 
                     # Saving the image
                     print("Saving the image")
                     img_name = "Testing_{}.png".format(count)
                     cv2.imwrite(img_name, frame)
 
-                    # Exit the while loop
-                    break
+                # Waiting time between measure
+                time.sleep(0.1)
 
-                # When everything done, release the capture
-                cap.release()
-                cv2.destroyAllWindows()
+                # Escape key in order to close the process and return to stand by position
+                if cv2.waitKey(20) == 27 or time.time() > t_end or button.is_pressed:
+                    print("Measurement stopped by User")
 
-            # Waiting time between measure
-            time.sleep(1)
-
-            # Escape key in order to close the process and return to stand by position
-            if cv2.waitKey(20) == 27 or time.time() > t_end or button.is_pressed:
-                break
+                    # When everything done, release the capture
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    GPIO.cleanup()
+                    sys.exit(0)
+                 
 
         # Reset by pressing CTRL + C
         except KeyboardInterrupt:
