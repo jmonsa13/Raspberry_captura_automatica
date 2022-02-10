@@ -68,15 +68,52 @@ if __name__ == '__main__':
     
     # Waiting for the button activation in order to continue with the program
     button.wait_for_press()
+
+    # Initialization
+    count = 0
             
     #Definition of t_end = 10 seconds. The maximum period of time where the camera program is active
     t_end = time.time() + 60
             
     while True:
         try:
+            # OpenCV configuration in order to have full screen viewer
+            cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
+            cv2.setWindowProperty("window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
             # Measuring Distance
             dist = distance()
             print("Measured Distance = %.1f cm" % dist)
+
+            # Taking the picture
+            if dist <= 10:
+                # Count
+                count += 1
+
+                # Camera turn on
+                cap = cv2.VideoCapture(0)
+
+                # Do while the video camera is on
+                while cap.isOpened():
+                    # Read Video frame by frame
+                    ret, frame = cap.read()
+
+                    if ret is False:
+                        break
+
+                    # Saving the image
+                    print("Saving the image")
+                    img_name = "Testing_{}.png".format(count)
+                    cv2.imwrite(img_name, frame)
+
+                    # Exit the while loop
+                    break
+
+                # When everything done, release the capture
+                cap.release()
+                cv2.destroyAllWindows()
+
+            # Waiting time between measure
             time.sleep(1)
 
             # Escape key in order to close the process and return to stand by position
