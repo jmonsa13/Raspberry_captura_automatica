@@ -65,14 +65,16 @@ def distance():
 # MAIN CODE
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    try:
-        while True:
-            # Waiting for the button activation in order to continue with the program
-            button.wait_for_press()
-
-            # Definition of t_end = 10 seconds. The maximum period of time where the camera program is active
-            t_end = time.time() + 10
-
+    
+    # Waiting for the button activation in order to continue with the program
+    button.wait_for_press()
+            
+    #Definition of t_end = 10 seconds. The maximum period of time where the camera program is active
+    t_end = time.time() + 60
+            
+    while True:
+        try:
+            # Measuring Distance
             dist = distance()
             print("Measured Distance = %.1f cm" % dist)
             time.sleep(1)
@@ -82,7 +84,7 @@ if __name__ == '__main__':
                 break
 
         # Reset by pressing CTRL + C
-    except KeyboardInterrupt:
-        print("Measurement stopped by User")
-        GPIO.cleanup()
+        except KeyboardInterrupt:
+            print("Measurement stopped by User")
+            GPIO.cleanup()
 
