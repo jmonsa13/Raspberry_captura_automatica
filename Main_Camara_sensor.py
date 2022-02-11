@@ -18,20 +18,18 @@ from gpiozero import Button
 # SETTING THE GPIO BOARD
 # ----------------------------------------------------------------------------------------------------------------------
 # GPIO Mode (BOARD / BCM)
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 # set GPIO Pins
-TRIG = 7
-ECHO = 12
+TRIG = 4  # Physical pin # 7
+ECHO = 18 # Physicial pin # 12
+button = Button(26)    # Physical pin # 37
 
 # set GPIO direction (IN / OUT)
 GPIO.setup(TRIG, GPIO.OUT)
 GPIO.output(TRIG, False)
 
 GPIO.setup(ECHO, GPIO.IN)
-
-# Button Definition
-button = Button(26)    # Button pin definition
 # ----------------------------------------------------------------------------------------------------------------------
 # FUNCTIONS
 # ----------------------------------------------------------------------------------------------------------------------
@@ -66,6 +64,8 @@ def distance():
 # MAIN CODE
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
+    # Starting message
+    print("Please push button to start script")
     
     # Waiting for the button activation in order to continue with the program
     button.wait_for_press()
