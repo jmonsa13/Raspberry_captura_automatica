@@ -78,52 +78,50 @@ if __name__ == '__main__':
             
     while True:
         try:
-            # OpenCV configuration in order to have full screen viewer
-            #cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
-            #cv2.setWindowProperty("window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-                        
-            # Camera turn on
-            cap = cv2.VideoCapture(0)
+            # Measuring Distance
+            dist = distance()
+            print("Measured Distance = %.1f cm" % dist)
 
-            # Do while the video camera is on
-            while cap.isOpened():
-                # Read Video frame by frame
-                ret, frame = cap.read()
+            # Taking the picture
+            if dist <= 10:
+                # Camera turn on
+                cap = cv2.VideoCapture(0)
 
-                if ret is False:
-                    break
+                # Do while the video camera is on
+                while cap.isOpened():
+                    # Read Video frame by frame
+                    ret, frame = cap.read()
+
+                    if ret is False:
+                        break
                     
-                # Showing the image
-                cv2.imshow("Video", frame)
-
-                # Measuring Distance
-                dist = distance()
-                print("Measured Distance = %.1f cm" % dist)
-
-                # Taking the picture
-                if dist <= 10:
+                    # Showing the image
+                    #cv2.imshow("Picture", frame)
+                
                     # Count
                     count += 1
 
                     # Saving the image
                     print("Saving the image")
-                    img_name = "Testing_{}.png".format(count)
+                    img_name = "./Images/Testing_{}.png".format(count)
                     cv2.imwrite(img_name, frame)
-
-                # Waiting time between measure
-                time.sleep(0.1)
-
-                # Escape key in order to close the process and return to stand by position
-                if cv2.waitKey(20) == 27 or time.time() > t_end or button.is_pressed:
-                    print("Measurement stopped by User")
-
+                    
+                    # Wait
+                    #time.sleep(1)
+                    
                     # When everything done, release the capture
                     cap.release()
                     cv2.destroyAllWindows()
-                    GPIO.cleanup()
-                    sys.exit(0)
-                 
 
+            # Waiting time between measure
+            time.sleep(1)         
+
+            # Escape key in order to close the process and return to stand by position
+            if cv2.waitKey(20) == 27 or time.time() > t_end or button.is_pressed:
+                print("Measurement stopped by User")
+                GPIO.cleanup()
+                sys.exit(0)
+                 
         # Reset by pressing CTRL + C
         except KeyboardInterrupt:
             print("Measurement stopped by User")
