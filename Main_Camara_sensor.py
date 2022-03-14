@@ -49,6 +49,7 @@ def distance():
     # save time of arrival
     while GPIO.input(ECHO) == 1:
         pass
+
     StopTime = time.time()
 
     # time difference between start and arrival
@@ -65,16 +66,14 @@ def distance():
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # Starting message
-    print("Please push button to start script")
-    
-    # Waiting for the button activation in order to continue with the program
-    button.wait_for_press()
+    print("Inicializando en 5 segundos")
+    time.sleep(5)
 
     # Initialization
     count = 0
             
     #Definition of t_end = 60 seconds. The maximum period of time where the camera program is active
-    t_end = time.time() + 60
+    t_end = time.time() + 86400 * 5
             
     while True:
         try:
@@ -117,7 +116,7 @@ if __name__ == '__main__':
             time.sleep(1)         
 
             # Escape key in order to close the process and return to stand by position
-            if cv2.waitKey(20) == 27 or time.time() > t_end or button.is_pressed:
+            if cv2.waitKey(20) == 27 or time.time() > t_end:
                 print("Measurement stopped by User")
                 GPIO.cleanup()
                 sys.exit(0)
