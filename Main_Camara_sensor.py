@@ -10,7 +10,6 @@ import time
 import numpy as np
 import sys
 
-import picamera
 import RPi.GPIO as GPIO
 from gpiozero import Button
 
@@ -61,13 +60,28 @@ def distance():
     return distance_cm
 
 
+def avg_distance(n=2):
+    # Inicializando variable
+    avg_dist = 0
+    
+    # Cuantas mediciones se toman
+    for i in range(n):
+        # Measuring distance
+        avg_dist += distance()
+        
+        # Waiting time between measure
+        time.sleep(1)
+    
+    return avg_dist/n
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # MAIN CODE
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     # Starting message
-    print("Inicializando en 5 segundos")
-    time.sleep(5)
+    print("Inicializando")
+    time.sleep(1)
 
     # Initialization
     count = 0
@@ -77,43 +91,58 @@ if __name__ == '__main__':
             
     while True:
         try:
-            # Measuring Distance
-            dist = distance()
-            print("Measured Distance = %.1f cm" % dist)
+            # Taking the distance            
+            avg_dist = avg_distance(n=5)
+            
+            print("Measured Distance = %.1f cm" % avg_dist)
 
             # Taking the picture
-            if dist <= 10:
-                # Camera turn on
-                cap = cv2.VideoCapture(0)
-
-                # Do while the video camera is on
-                while cap.isOpened():
-                    # Read Video frame by frame
-                    ret, frame = cap.read()
-
-                    if ret is False:
-                        break
-                    
-                    # Showing the image
-                    #cv2.imshow("Picture", frame)
+            if avg_dist <= 250:             
                 
-                    # Count
-                    count += 1
-
-                    # Saving the image
-                    print("Saving the image")
-                    img_name = "./Images/Testing_{}.png".format(count)
-                    cv2.imwrite(img_name, frame)
+                # Wait final position of the transfer
+                time.sleep(2)
+                
+                # Take n photos in intervals of 5 seconds each
+                for num in range(1):
+                
+                    # Camera turn on
+                    cap = cv2.VideoCapture(0)
                     
-                    # Wait
-                    #time.sleep(1)
-                    
-                    # When everything done, release the capture
-                    cap.release()
-                    cv2.destroyAllWindows()
+                    # Resolution of the camera ASPECT RATIO 4:3
+                    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920) # Max 2592 | 1280 | 1920
+                    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1440) # Max 1944 | 962 |1440
 
+                    # Do while the video camera is on
+                    while cap.isOpened():
+                        # Read Video frame by frame
+                        ret, frame = cap.read()
+
+                        if ret is False:
+                            break
+                    
+                        # Count
+                        count += 1
+
+                        # Saving the image
+                        print("Saving the image")
+                        img_name = "./Images/Testing_{}.png".format(count)
+                        cv2.imwrite(img_name, frame)
+                        
+                        
+                        # When everything done, release the capture
+                        cap.release()
+                        cv2.destroyAllWindows()
+                        
+                    # Sleeping for 5 seconds between measure
+                    print("Sleeping for 5 seconds")
+                    time.sleep(5)
+                    
+                # Wait for the transfer to move out
+                print("Waiting for tranfer to move out for 90 seconds")
+                time.sleep(90)
+                    
             # Waiting time between measure
-            time.sleep(1)         
+            time.sleep(2)         
 
             # Escape key in order to close the process and return to stand by position
             if cv2.waitKey(20) == 27 or time.time() > t_end:
